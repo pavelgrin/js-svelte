@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "airbnb-base"
+  ],
+
+  "plugins": [
+    "svelte3"
+  ],
+
+  "overrides": [
+    {
+      "files": ["**/*.svelte"],
+      "processor": "svelte3/svelte3"
+    }
+  ],
+
+  "rules": {
+    "import/prefer-default-export": 0,
+    "no-multiple-empty-lines": 0
+  },
+
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+
+  "env": {
+    "browser": true
+  }
+}

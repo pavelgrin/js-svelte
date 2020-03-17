@@ -34,6 +34,14 @@ var bundle = (function () {
     function set_current_component(component) {
         current_component = component;
     }
+    function get_current_component() {
+        if (!current_component)
+            throw new Error(`Function called outside component initialization`);
+        return current_component;
+    }
+    function onMount(fn) {
+        get_current_component().$$.on_mount.push(fn);
+    }
 
     const dirty_components = [];
     const binding_callbacks = [];
@@ -218,21 +226,31 @@ var bundle = (function () {
         }
     }
 
+    /**
+     * resolve received data
+     *
+     * @param {Promise} promise
+     * @return Promise
+     */
     function of(promise) {
       const errorMessage = 'File reading error';
 
       return Promise.resolve(promise)
-        .then((res) => {
-          return Promise.resolve(res.json()).then((data) => {
+        .then((res) => (
+          Promise.resolve(res.json()).then((data) => {
             if (res.ok) return [null, data];
             return [{ message: errorMessage }, null];
-          });
-        })
-        .catch(() => {
-          return [{ message: errorMessage }, null];
-        });
+          })
+        ))
+        .catch(() => [{ message: errorMessage }, null]);
     }
 
+    /**
+     * fetch JSON data
+     *
+     * @param {String} url
+     * @return Array [error, json]
+     */
     async function getLocalJSON(url) {
       const response = await of(fetch(url));
       return response;
@@ -265,16 +283,29 @@ var bundle = (function () {
     	return data;
     }
 
-    function instance($$self) {
-    	setInterval(
-    		async () => {
-    			const data = await getData(); // console.log(names);
+    async function getNames() {
+    	const data = await getLocalJSON("/public/data/names.json");
+    	return data;
+    }
 
-    			// const names = await getNames();
-    			console.log(data);
-    		},
-    		15000
-    	); // console.log(names);
+    function instance($$self) {
+    	let data = null;
+    	let names = null;
+
+    	onMount(async () => {
+    		data = await getData();
+    		names = await getNames();
+
+    		setInterval(
+    			async () => {
+    				data = await getData();
+    			},
+    			15000
+    		);
+
+    		console.log(data);
+    		console.log(names);
+    	});
 
     	return [];
     }
@@ -287,7 +318,7 @@ var bundle = (function () {
     }
 
     const app = new App({
-    	target: document.body,
+      target: document.body,
     });
 
     return app;

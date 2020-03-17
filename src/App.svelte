@@ -1,15 +1,6 @@
-<div>Hello world!</div>
-
 <script>
+import { onMount } from 'svelte';
 import { getLocalJSON } from './api';
-
-setInterval(async () => {
-    const data = await getData();
-    // const names = await getNames();
-    console.log(data);
-    // console.log(names);
-}, 15000);
-
 
 async function getData() {
   const data = await getLocalJSON('/public/data/data.json');
@@ -20,7 +11,24 @@ async function getNames() {
   const data = await getLocalJSON('/public/data/names.json');
   return data;
 }
+
+let data = null;
+let names = null;
+
+onMount(async () => {
+  data = await getData();
+  names = await getNames();
+
+  setInterval(async () => {
+    data = await getData();
+  }, 15000);
+
+  console.log(data);
+  console.log(names);
+});
 </script>
+
+<div>Hello world!</div>
 
 <style>
 
