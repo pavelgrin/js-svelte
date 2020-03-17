@@ -1,0 +1,14 @@
+* {
+  box-sizing: border-box;
+}
+
+body, input, textarea, button {
+  font-family: "Arial", "sans-serif";
+}
+
+input {
+  padding: 0.4em;
+  box-sizing: border-box;
+  border: 1px solid hsl(0, 0%, 80%);
+  border-radius: 2px;
+}

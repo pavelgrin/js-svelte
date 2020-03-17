@@ -17,14 +17,14 @@ export default {
     json(),
 
     svelte({
-			css: css => {
-				css.write(`${buildPath}/bundle.css`);
-			}
+      css(css) {
+        css.write(`${buildPath}/bundle.css`);
+      },
     }),
 
-		resolve({
-			browser: true,
-			dedupe: ['svelte'],
-		}),
+    resolve({
+      browser: true,
+      dedupe: ['svelte'],
+    }),
   ],
 };
