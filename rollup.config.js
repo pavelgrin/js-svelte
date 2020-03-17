@@ -9,7 +9,8 @@ export default {
 
   output: {
     file: `${buildPath}/bundle.js`,
-    format: 'cjs',
+    format: 'iife',
+    name: 'bundle',
   },
 
   plugins: [

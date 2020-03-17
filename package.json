@@ -2,8 +2,10 @@
   "name": "js-svelte",
   "version": "1.0.0",
   "scripts": {
+    "watch": "npm run build -- -w",
     "build": "rollup -c"
   },
+
   "devDependencies": {
     "@rollup/plugin-json": "^4.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
