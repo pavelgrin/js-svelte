@@ -28,12 +28,12 @@ function pickProduct(productId) {
     {:else}
       {#each matchedGoods as id}
         <div
-          data-picked="{goods[id].picked}"
+          data-picked={goods[id].picked}
           class="product-category__item"
-          on:click="{pickProduct(id)}"
+          on:click={pickProduct(id)}
         >
           <div>{goods[id].name} ({goods[id].quantity})</div>
-          <div data-price-change="{goods[id].priceChange}">
+          <div data-price-change={goods[id].priceChange}>
             {goods[id].rubPrice}
           </div>
         </div>

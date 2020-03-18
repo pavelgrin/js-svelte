@@ -1,15 +1,11 @@
 <script>
-import { beforeUpdate } from 'svelte';
-
 export let items = null;
 
 let total = 0;
 
-beforeUpdate(() => {
-  total = (items || [])
-    .reduce((s, p) => s + Number(p.rubPrice) * Number(p.pickedQuantity), 0)
-    .toFixed(2);
-});
+$: total = (items || [])
+  .reduce((s, p) => s + Number(p.rubPrice) * Number(p.pickedQuantity), 0)
+  .toFixed(2);
 </script>
 
 <table>

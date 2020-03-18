@@ -18,6 +18,27 @@ const data = {
   categories: null,
 };
 
+/**
+ * validate and update exchangeRate value
+ *
+ * @param {Object} Event.detail - payload
+ * @return Void
+*/
+function handleExchangeRateInputValue(e) {
+  let newRate = Number(e.target.value);
+
+  if (Number.isNaN(newRate) || newRate < 20) {
+    newRate = 20;
+  } else if (newRate > 80) {
+    newRate = 80;
+  } else {
+    newRate = e.target.value;
+  }
+
+  e.target.value = newRate;
+  exchangeRate = newRate;
+}
+
 
 /**
  * delay event processing until typing stops
@@ -141,8 +162,10 @@ function prepareData(goods, names) {
  * @return Void
 */
 function addProductToCart({ detail }) {
-  data.goods[detail.productId].picked = true;
-  data.goods[detail.productId].pickedQuantity = 1;
+  const { productId } = detail;
+
+  data.goods[productId].picked = true;
+  data.goods[productId].pickedQuantity = 1;
 }
 
 /**
@@ -152,7 +175,8 @@ function addProductToCart({ detail }) {
  * @return Void
 */
 function updatePickedQuantity({ detail }) {
-  data.goods[detail.productId].pickedQuantity = detail.pickedQuantity;
+  const { productId, pickedQuantity } = detail;
+  data.goods[productId].pickedQuantity = Number(pickedQuantity);
 }
 
 /**
@@ -208,10 +232,11 @@ onMount(async () => {
       <label for="rate">Курс USD</label>
       <input
         id="rate"
-        bind:value="{exchangeRate}"
+        value={exchangeRate}
         type="number"
         min="20"
-        max="80">
+        max="80"
+        on:input={handleExchangeRateInputValue}>
     </div>
 
     {#if !data.categories}
