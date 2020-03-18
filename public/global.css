@@ -1,5 +1,11 @@
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+}
+
+body {
+  padding: 0.5em;
 }
 
 body, input, textarea, button {
@@ -12,3 +18,4 @@ input {
   border: 1px solid hsl(0, 0%, 80%);
   border-radius: 2px;
 }
+

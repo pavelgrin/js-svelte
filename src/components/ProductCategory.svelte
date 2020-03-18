@@ -1,23 +1,29 @@
 <div class="product-category">
   <div class="product-category__title">Category name</div>
   <div class="product-category__list">
-    <div class="product-category__item">
-      <div>product product product product product product product product</div>
-      <div data-increase>999.99</div>
-    </div>
+    {#if true}
+      <div class="product-category__empty">
+        Товары данной категории отсутствуют
+      </div>
+    {:else}
+      <div class="product-category__item">
+        <div>product product product product product product product product</div>
+        <div data-increase>999.99</div>
+      </div>
 
-    <div class="product-category__item">
-      <div>product product product product product product product product</div>
-      <div data-decrease>999.99</div>
-    </div>
+      <div class="product-category__item">
+        <div>product product product product product product product product</div>
+        <div data-decrease>999.99</div>
+      </div>
 
-    <div
-      data-picked
-      class="product-category__item"
-    >
-      <div>product product product product product product product product</div>
-      <div >999.99</div>
-    </div>
+      <div
+        data-picked
+        class="product-category__item"
+      >
+        <div>product product product product product product product product</div>
+        <div >999.99</div>
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -53,14 +59,17 @@
 }
 
 .product-category__item > *:first-child {
+  flex-grow: 1;
   padding: 0.4em;
 }
 .product-category__item > *:last-child {
+  flex-shrink: 0;
+
   display: flex;
   justify-content: center;
   align-items: center;
 
-  width: 200px;
+  width: 100px;
 
   padding: 0.4em;
   border-left: 1px solid hsl(0, 0%, 80%);
@@ -75,5 +84,10 @@
 
 .product-category__item > *:last-child[data-decrease] {
   background-color: hsla(120, 100%, 25%, .2);
+}
+
+.product-category__empty {
+  width: 100%;
+  text-align: center;
 }
 </style>

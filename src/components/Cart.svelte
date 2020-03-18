@@ -11,60 +11,73 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>Product Product ProductProduct</td>
-      <td class="cart__quantity-cell">
-        <div class="cart__quantity">
-          <input type="text" value="1">
-          <span>шт.</span>
-        </div>
+    {#if true}
+      <tr><td colspan="4" class="cart__empty">Корзина пуста</td></tr>
+    {:else}
+      <tr>
+        <td>Product Product ProductProduct</td>
+        <td class="cart__quantity-cell">
+          <div class="cart__quantity">
+            <input type="text" value="1">
+            <span>шт.</span>
+          </div>
 
-        <div class="cart__limited-item">
-          Количество ограничено
-        </div>
-      </td>
-      <td class="cart__price-cell">999.99</td>
-      <td class="cart__action-cell">Удалить</td>
-    </tr>
-    <tr>
-      <td>Product Product ProductProduct</td>
-      <td class="cart__quantity-cell">
-        <div class="cart__quantity">
-          <input type="text" value="1">
-          <span>шт.</span>
-        </div>
+          <div class="cart__limited-item">
+            Количество ограничено
+          </div>
+        </td>
+              <td class="cart__price-cell">
+          <strong>999.99 руб.</strong>
+          <span>/шт</span>
+        </td>
+        <td class="cart__action-cell">Удалить</td>
+      </tr>
+      <tr>
+        <td>Product Product ProductProduct</td>
+        <td class="cart__quantity-cell">
+          <div class="cart__quantity">
+            <input type="text" value="1">
+            <span>шт.</span>
+          </div>
 
-        <div class="cart__limited-item">
-          Количество ограничено
-        </div>
-      </td>
-      <td class="cart__price-cell">999.99</td>
-      <td class="cart__action-cell">Удалить</td>
-    </tr>
-    <tr>
-      <td>Product Product ProductProduct</td>
-      <td class="cart__quantity-cell">
-        <div class="cart__quantity">
-          <input type="text" value="1">
-          <span>шт.</span>
-        </div>
+          <div class="cart__limited-item">
+            Количество ограничено
+          </div>
+        </td>
+        <td class="cart__price-cell">
+          <strong>999.99 руб.</strong>
+          <span>/шт</span>
+        </td>
+        <td class="cart__action-cell">Удалить</td>
+      </tr>
+      <tr>
+        <td>Product Product ProductProduct</td>
+        <td class="cart__quantity-cell">
+          <div class="cart__quantity">
+            <input type="text" value="1">
+            <span>шт.</span>
+          </div>
 
-        <div class="cart__limited-item">
-          Количество ограничено
-        </div>
-      </td>
-      <td class="cart__price-cell">999.99</td>
-      <td class="cart__action-cell">Удалить</td>
-    </tr>
-    <tr>
-      <td
-        colspan="4"
-        class="cart__total"
-      >
-        <span>Общая стоимость</span>
-        <strong>3 890,76</strong>
-      </td>
-    </tr>
+          <div class="cart__limited-item">
+            Количество ограничено
+          </div>
+        </td>
+              <td class="cart__price-cell">
+          <strong>999.99 руб.</strong>
+          <span>/шт</span>
+        </td>
+        <td class="cart__action-cell">Удалить</td>
+      </tr>
+      <tr>
+        <td
+          colspan="4"
+          class="cart__total"
+        >
+          <span>Общая стоимость</span>
+          <strong>3 890,76</strong>
+        </td>
+      </tr>
+    {/if}
   </tbody>
 </table>
 
@@ -72,7 +85,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  border-spacing: 3px;
+  border-spacing: 0px;
 }
 
 th, td {
@@ -84,10 +97,22 @@ th, td {
 }
 
 .cart__quantity-cell,
-.cart__price-cell,
 .cart__action-cell {
   width: 100px;
   min-width: 100px;
+}
+
+.cart__price-cell {
+  width: 200px;
+  min-width: 200px;
+}
+
+.cart__price-cell > *:first-child {
+  font-size: 1.1em;
+}
+
+.cart__action-cell {
+  text-align: right;
 }
 
 .cart__quantity-cell > * + * {
@@ -104,6 +129,11 @@ th, td {
   border: 1px dotted hsl(24, 100%, 50%);
   background-color: hsl(37, 100%, 97%);
   color: hsl(24, 100%, 50%);
+}
+
+.cart__empty {
+  text-align: center;
+  border-bottom: 1px solid hsl(0, 0%, 80%);
 }
 
 .cart__total {
