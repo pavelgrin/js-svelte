@@ -4,6 +4,7 @@ import { getLocalJSON } from './api';
 
 import ProductCategory from './components/ProductCategory.svelte';
 import Cart from './components/Cart.svelte';
+import CartItem from './components/CartItem.svelte';
 
 /*
  * declare main variables
@@ -15,7 +16,6 @@ let exchangeRate = Math.floor(Math.random() * (81 - 20) + 20);
 const data = {
   goods: null,
   categories: null,
-  cartItems: null,
 };
 
 
@@ -95,8 +95,14 @@ const recalcPrices = debounce((rate) => {
 function prepareData(goods, names) {
   if (!(goods && names)) return;
 
-  data.goods = data.goods || {};
+  data.goods = { ...data.goods };
   data.categories = {};
+
+  // get id->name object to fill goods array
+  const productNames = {};
+  Object.values(names).forEach((item) => {
+    Object.assign(productNames, { ...item.B });
+  });
 
   // make the product list as an object, where keys are product ids
   goods.forEach((item) => {
@@ -107,8 +113,10 @@ function prepareData(goods, names) {
       priceChange: 'flat', // flat, increase or decrease
 
       picked: false, // the product are in the cart or not
+      pickedQuantity: 0,
 
       id: item.T,
+      name: productNames[item.T] && productNames[item.T].N,
       quantity: item.P,
 
       ...data.goods[item.T],
@@ -120,31 +128,46 @@ function prepareData(goods, names) {
     data.categories[key] = {
       title: names[key].G,
       matchedGoods: Object.keys(names[key].B)
-        .map((pId) => {
-          if (!data.goods[pId]) return null;
-          return {
-            id: pId,
-            name: names[key].B[pId].N,
-          };
-        })
+        .map((pId) => data.goods[pId] && pId)
         .filter((p) => p),
     };
   });
 }
 
 /**
- * handle JSON data and set a convenient format
+ * add product to the cart
  *
  * @param {Object} Event.detail - payload
  * @return Void
 */
 function addProductToCart({ detail }) {
   data.goods[detail.productId].picked = true;
+  data.goods[detail.productId].pickedQuantity = 1;
+}
+
+/**
+ * update picked quantity
+ *
+ * @param {Object} Event.detail - payload
+ * @return Void
+*/
+function updatePickedQuantity({ detail }) {
+  data.goods[detail.productId].pickedQuantity = detail.pickedQuantity;
+}
+
+/**
+ * remove product from cart
+ *
+ * @param {Object} Event.detail - payload
+ * @return Void
+*/
+function removeProductFromCart({ detail }) {
+  data.goods[detail.productId].picked = false;
+  data.goods[detail.productId].pickedQuantity = 0;
 }
 
 // recalculate prices with every change of usd rate
 $: recalcPrices(exchangeRate);
-// TODO: get goods wich are into the cart
 
 /**
  * init app, get basic data or show any error
@@ -200,7 +223,7 @@ onMount(async () => {
         <div>
           <ProductCategory
             {...category}
-            goods={data.goods}
+            goods={data.goods || {}}
             on:pick={addProductToCart} />
         </div>
       {/each}
@@ -208,7 +231,14 @@ onMount(async () => {
 
     <div>
       <Cart
-        items="{data.goods && Object.values(data.goods).filter((p) => p.picked)}" />
+        items={data.goods && Object.values(data.goods).filter((p) => p.picked)}
+        let:prop={item}
+      >
+        <CartItem
+          {...item}
+          on:update={updatePickedQuantity}
+          on:remove={removeProductFromCart} />
+      </Cart>
     </div>
   </div>
 {/if}

@@ -1,11 +1,11 @@
 <script>
 import { createEventDispatcher } from 'svelte';
 
-const dispatch = createEventDispatcher();
-
 export let title = 'Not set';
 export let matchedGoods = [];
 export let goods = {};
+
+const dispatch = createEventDispatcher();
 
 /**
  * emit event to put an item into the cart
@@ -26,13 +26,13 @@ function pickProduct(productId) {
         Товары данной категории отсутствуют
       </div>
     {:else}
-      {#each matchedGoods as { name, id }}
+      {#each matchedGoods as id}
         <div
           data-picked="{goods[id].picked}"
           class="product-category__item"
           on:click="{pickProduct(id)}"
         >
-          <div>{name} ({goods[id].quantity})</div>
+          <div>{goods[id].name} ({goods[id].quantity})</div>
           <div data-price-change="{goods[id].priceChange}">
             {goods[id].rubPrice}
           </div>

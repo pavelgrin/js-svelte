@@ -19,3 +19,18 @@ input {
   border-radius: 2px;
 }
 
+button {
+  margin: 0;
+  padding: 0.2em 0.4em;
+
+  background-color: hsl(206, 28%, 95%);
+  border: 1px solid hsl(0, 0%, 80%);
+  border-radius: 3px;
+
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  -moz-user-select: none;
+  line-height: 1.5;
+  text-align: center;
+}
