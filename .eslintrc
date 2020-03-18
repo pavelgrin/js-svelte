@@ -16,7 +16,8 @@
 
   "rules": {
     "import/prefer-default-export": 0,
-    "no-multiple-empty-lines": 0
+    "no-multiple-empty-lines": 0,
+    "import/no-mutable-exports": 0,
   },
 
   "parserOptions": {

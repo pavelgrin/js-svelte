@@ -1,28 +1,28 @@
+<script>
+export let title = 'Not set';
+export let matchedGoods = [];
+export let goods = {};
+</script>
+
 <div class="product-category">
-  <div class="product-category__title">Category name</div>
+  <div class="product-category__title">{title}</div>
   <div class="product-category__list">
-    {#if true}
+    {#if !(matchedGoods.length)}
       <div class="product-category__empty">
         Товары данной категории отсутствуют
       </div>
     {:else}
-      <div class="product-category__item">
-        <div>product product product product product product product product</div>
-        <div data-increase>999.99</div>
-      </div>
-
-      <div class="product-category__item">
-        <div>product product product product product product product product</div>
-        <div data-decrease>999.99</div>
-      </div>
-
-      <div
-        data-picked
-        class="product-category__item"
-      >
-        <div>product product product product product product product product</div>
-        <div >999.99</div>
-      </div>
+      {#each matchedGoods as { name, id }}
+        <div
+          data-picked="{goods[id].picked}"
+          class="product-category__item"
+        >
+          <div>{name} ({goods[id].quantity})</div>
+          <div data-price-change="{goods[id].priceChange}">
+            {goods[id].rubPrice}
+          </div>
+        </div>
+      {/each}
     {/if}
   </div>
 </div>
@@ -54,7 +54,7 @@
   border-bottom: 1px solid hsl(0, 0%, 80%);
 }
 
-.product-category__item[data-picked] {
+.product-category__item[data-picked="true"] {
   background-color: hsl(49, 64%, 79%);
 }
 
@@ -78,16 +78,17 @@
   font-weight: bold;
 }
 
-.product-category__item > *:last-child[data-increase] {
+.product-category__item > *:last-child[data-price-change="increase"] {
   background-color: hsla(0, 100%, 50%, .2);
 }
 
-.product-category__item > *:last-child[data-decrease] {
+.product-category__item > *:last-child[data-price-change="decrease"] {
   background-color: hsla(120, 100%, 25%, .2);
 }
 
 .product-category__empty {
   width: 100%;
+  padding: 0.2em;
   text-align: center;
 }
 </style>

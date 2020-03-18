@@ -5,6 +5,20 @@ import { getLocalJSON } from './api';
 import ProductCategory from './components/ProductCategory.svelte';
 import Cart from './components/Cart.svelte';
 
+/*
+ * declare main variables
+ */
+let appError = null;
+// init random usd rate between 20 and 80
+let exchangeRate = Math.floor(Math.random() * (81 - 20) + 20);
+
+const data = {
+  goods: null,
+  categories: null,
+  cartItems: null,
+};
+
+
 /**
  * delay event processing until typing stops
  *
@@ -29,7 +43,7 @@ function debounce(func, ms) {
 /**
  * get good list
  *
- * @param {Avoid}
+ * @param {Void}
  * @return Array [error, data]
  */
 async function getGoods() {
@@ -40,7 +54,7 @@ async function getGoods() {
 /**
  * get categories and good names
  *
- * @param {Avoid}
+ * @param {Void}
  * @return Array [error, data]
  */
 async function getNames() {
@@ -50,74 +64,132 @@ async function getNames() {
 
 /**
  * change prices according to USD rate
- * delayed recalculation
+ * 300ms delayed recalculation
+ *
+ * @param {Number} rate
+ * @return Void
 */
-const recalcPrices = debounce(() => {
-  //
+const recalcPrices = debounce((rate) => {
+  Object.keys(data.goods).forEach((key) => {
+    const usdPrice = Number(data.goods[key].usdPrice);
+
+    const oldRubPrice = Number(data.goods[key].rubPrice);
+    const newRubPrice = Number((usdPrice * Number(rate)).toFixed(2));
+
+    const priceChange = (newRubPrice > oldRubPrice && 'increase')
+                     || (newRubPrice < oldRubPrice && 'decrease')
+                     || 'flat';
+
+    data.goods[key].rubPrice = newRubPrice.toFixed(2);
+    data.goods[key].priceChange = priceChange; // flat, increase or decrease
+  });
 }, 300);
 
 /**
  * handle JSON data and set a convenient format
+ *
+ * @param {Array} goods
+ * @param {Object} names - categories with matched goods
+ * @return Void
 */
-function prepareData() {
-  //
+function prepareData(goods, names) {
+  if (!(goods && names)) return;
+
+  data.goods = {};
+  data.categories = {};
+
+  // make the product list as an object, where keys are product ids
+  goods.forEach((item) => {
+    data.goods[item.T] = {
+      // get the price in rubles, round to two decimal places
+      rubPrice: (Number(item.C) * Number(exchangeRate)).toFixed(2),
+      usdPrice: item.C,
+      priceChange: 'flat', // flat, increase or decrease
+
+      picked: false, // the product are in the cart or not
+
+      id: item.T,
+      quantity: item.P,
+    };
+  });
+
+  // make the categories with filtered goods
+  Object.keys(names).forEach((key) => {
+    data.categories[key] = {
+      title: names[key].G,
+      matchedGoods: Object.keys(names[key].B)
+        .map((pId) => {
+          if (!data.goods[pId]) return null;
+          return {
+            id: pId,
+            name: names[key].B[pId].N,
+          };
+        })
+        .filter((p) => p),
+    };
+  });
 }
 
-/*
- * declare main variables
- */
-const data = {
-  error: null,
-
-  // init random usd rate between 20 and 80
-  exchangeRate: Math.floor(Math.random() * (81 - 20) + 20),
-
-  goods: null,
-  names: null,
-
-  cartItemList: null,
-};
-
+// recalculate prices with every change of usd rate
+$: recalcPrices(exchangeRate);
 
 /**
  * init app, get basic data or show any error
  */
 onMount(async () => {
-  let dataErr = null;
+  let goodsErr = null;
   let namesErr = null;
 
-  [dataErr, data.goods] = await getGoods();
-  [namesErr, data.names] = await getNames();
+  let goods = null;
+  let names = null;
 
-  data.error = dataErr || namesErr;
+  [goodsErr, goods] = await getGoods();
+  [namesErr, names] = await getNames();
+
+  appError = goodsErr || namesErr || (goods && !goods.Success && goods.Error);
+  if (appError) return;
+
+  goods = goods && goods.Value && goods.Value.Goods;
+  prepareData(goods, names);
 
   setInterval(async () => {
-    [data.error, data.goods] = await getGoods();
-  }, 15000);
+    appError = null;
+    [appError, goods] = await getGoods();
+    if (appError) return;
 
-  console.log(data.goods);
-  console.log(data.names);
+    goods = goods && goods.Value && goods.Value.Goods;
+    prepareData(goods, names);
+  }, 15000);
 });
 </script>
 
 
-{#if data.error}
-  <div class="app__error">{ data.error.message }</div>
+{#if appError}
+  <div class="app__error">{ appError.message }</div>
 {:else}
   <div class="app__content">
     <div>
       <label for="rate">Курс USD</label>
-      <input id="rate" type="text" bind:value="{data.exchangeRate}">
+      <input
+        id="rate"
+        bind:value="{exchangeRate}"
+        type="number"
+        min="20"
+        max="80">
     </div>
 
-    {#if true}
+    {#if !data.categories}
       <div class="app__empty-categories">
         <strong>Список категорий пуст</strong>
       </div>
     {:else}
-      <div><ProductCategory /></div>
-      <div><ProductCategory /></div>
-      <div><ProductCategory /></div>
+      {#each Object.values(data.categories) as category}
+        <div>
+          <ProductCategory
+            {...category}
+            goods={data.goods} />
+        </div>
+      {/each}
     {/if}
 
     <div><Cart /></div>
