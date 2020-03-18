@@ -68,7 +68,7 @@ function debounce(func, ms) {
  * @return Array [error, data]
  */
 async function getGoods() {
-  const res = await getLocalJSON('/public/data/data.json');
+  const res = await getLocalJSON('./data/data.json');
   return res;
 }
 
@@ -79,7 +79,7 @@ async function getGoods() {
  * @return Array [error, data]
  */
 async function getNames() {
-  const res = await getLocalJSON('/public/data/names.json');
+  const res = await getLocalJSON('./data/names.json');
   return res;
 }
 
