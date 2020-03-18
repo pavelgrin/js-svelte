@@ -1,7 +1,21 @@
 <script>
+import { createEventDispatcher } from 'svelte';
+
+const dispatch = createEventDispatcher();
+
 export let title = 'Not set';
 export let matchedGoods = [];
 export let goods = {};
+
+/**
+ * emit event to put an item into the cart
+ *
+ * @param {Number} productId
+ * @return Void
+*/
+function pickProduct(productId) {
+  dispatch('pick', { productId });
+}
 </script>
 
 <div class="product-category">
@@ -16,6 +30,7 @@ export let goods = {};
         <div
           data-picked="{goods[id].picked}"
           class="product-category__item"
+          on:click="{pickProduct(id)}"
         >
           <div>{name} ({goods[id].quantity})</div>
           <div data-price-change="{goods[id].priceChange}">
@@ -28,13 +43,9 @@ export let goods = {};
 </div>
 
 <style>
-.product-category {
-  border: 1px solid hsl(0, 0%, 80%);
-}
-
 .product-category__title {
   padding: 0.2em;
-  border-bottom: 1px solid hsl(0, 0%, 80%);
+  border: 1px solid hsl(0, 0%, 80%);
   background-color: hsl(195, 22%, 85%);
 
   color: hsl(0, 0%, 27%);
@@ -52,16 +63,31 @@ export let goods = {};
   overflow: hidden;
 
   border-bottom: 1px solid hsl(0, 0%, 80%);
+  border-right: 1px solid hsl(0, 0%, 80%);
+
+  user-select: none;
+  -moz-user-select: none;
+}
+
+.product-category__item:nth-child(2n + 1) {
+  border-left: 1px solid hsl(0, 0%, 80%);
 }
 
 .product-category__item[data-picked="true"] {
   background-color: hsl(49, 64%, 79%);
 }
 
+.product-category__item:hover:not([data-picked="true"]) {
+  cursor: pointer;
+  background-color: hsl(0, 0%, 95%);
+  opacity: 0.6;
+}
+
 .product-category__item > *:first-child {
   flex-grow: 1;
   padding: 0.4em;
 }
+
 .product-category__item > *:last-child {
   flex-shrink: 0;
 
@@ -72,8 +98,6 @@ export let goods = {};
   width: 100px;
 
   padding: 0.4em;
-  border-left: 1px solid hsl(0, 0%, 80%);
-  border-right: 1px solid hsl(0, 0%, 80%);
   background-color: hsl(0, 0%, 95%);
   font-weight: bold;
 }
@@ -90,5 +114,7 @@ export let goods = {};
   width: 100%;
   padding: 0.2em;
   text-align: center;
+  border: 1px solid hsl(0, 0%, 80%);
+  border-top: 0;
 }
 </style>

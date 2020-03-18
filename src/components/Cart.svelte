@@ -1,4 +1,5 @@
 <script>
+export let items = [];
 </script>
 
 <table>
@@ -11,7 +12,7 @@
     </tr>
   </thead>
   <tbody>
-    {#if true}
+    {#if !items.length}
       <tr><td colspan="4" class="cart__empty">Корзина пуста</td></tr>
     {:else}
       <tr>

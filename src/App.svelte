@@ -66,7 +66,7 @@ async function getNames() {
  * change prices according to USD rate
  * 300ms delayed recalculation
  *
- * @param {Number} rate
+ * @param {Number|String} rate
  * @return Void
 */
 const recalcPrices = debounce((rate) => {
@@ -95,7 +95,7 @@ const recalcPrices = debounce((rate) => {
 function prepareData(goods, names) {
   if (!(goods && names)) return;
 
-  data.goods = {};
+  data.goods = data.goods || {};
   data.categories = {};
 
   // make the product list as an object, where keys are product ids
@@ -110,6 +110,8 @@ function prepareData(goods, names) {
 
       id: item.T,
       quantity: item.P,
+
+      ...data.goods[item.T],
     };
   });
 
@@ -130,8 +132,19 @@ function prepareData(goods, names) {
   });
 }
 
+/**
+ * handle JSON data and set a convenient format
+ *
+ * @param {Object} Event.detail - payload
+ * @return Void
+*/
+function addProductToCart({ detail }) {
+  data.goods[detail.productId].picked = true;
+}
+
 // recalculate prices with every change of usd rate
 $: recalcPrices(exchangeRate);
+// TODO: get goods wich are into the cart
 
 /**
  * init app, get basic data or show any error
@@ -187,12 +200,16 @@ onMount(async () => {
         <div>
           <ProductCategory
             {...category}
-            goods={data.goods} />
+            goods={data.goods}
+            on:pick={addProductToCart} />
         </div>
       {/each}
     {/if}
 
-    <div><Cart /></div>
+    <div>
+      <Cart
+        items="{data.goods && Object.values(data.goods).filter((p) => p.picked)}" />
+    </div>
   </div>
 {/if}
 
