@@ -131,10 +131,13 @@ function prepareData(goods, names) {
       // get the price in rubles, round to two decimal places
       rubPrice: (Number(item.C) * Number(exchangeRate)).toFixed(2),
       usdPrice: item.C,
-      priceChange: 'flat', // flat, increase or decrease
+
+      // possible values: flat, increase or decrease
+      // to highlight price cells, changes in recalcPrices func
+      priceChange: 'flat',
 
       picked: false, // the product are in the cart or not
-      pickedQuantity: 0,
+      pickedQuantity: 0, // default value
 
       id: item.T,
       name: productNames[item.T] && productNames[item.T].N,
@@ -206,12 +209,14 @@ onMount(async () => {
   [goodsErr, goods] = await getGoods();
   [namesErr, names] = await getNames();
 
+  // if there is any error - stop calculating
   appError = goodsErr || namesErr || (goods && !goods.Success && goods.Error);
   if (appError) return;
 
   goods = goods && goods.Value && goods.Value.Goods;
   prepareData(goods, names);
 
+  // get data every 15 sec according to the condition of the task
   setInterval(async () => {
     appError = null;
     [appError, goods] = await getGoods();
