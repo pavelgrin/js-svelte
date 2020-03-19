@@ -1,5 +1,5 @@
 <script>
-import { createEventDispatcher } from 'svelte';
+import { onMount, createEventDispatcher } from 'svelte';
 
 export let id;
 export let name;
@@ -10,27 +10,13 @@ export let rubPrice;
 const dispatch = createEventDispatcher();
 const quantityWarningLevel = 5;
 
-/**
- * validate value and
- * emit event to update pickedQuantity
- *
- * @param {Object} Event.detail - payload
- * @return Void
-*/
-function handlePickedQuantityInputValue(e) {
-  let newQuantity = Number(e.target.value);
+let mutablePickedQuantity = 0;
 
-  if (Number.isNaN(newQuantity) || newQuantity < 1) {
-    newQuantity = 1;
-  } else if (newQuantity > quantity) {
-    newQuantity = quantity;
-  } else {
-    newQuantity = e.target.value;
-  }
+$: dispatch('update', { productId: id, pickedQuantity: mutablePickedQuantity });
 
-  e.target.value = newQuantity;
-  dispatch('update', { productId: id, pickedQuantity: e.target.value });
-}
+onMount(() => {
+  mutablePickedQuantity = pickedQuantity;
+});
 </script>
 
 <tr>
@@ -38,11 +24,10 @@ function handlePickedQuantityInputValue(e) {
   <td>
     <div class="cart-item__quantity">
       <input
-        value={pickedQuantity}
+        bind:value={mutablePickedQuantity}
         type="number"
         min="1"
-        max={quantity}
-        on:input={handlePickedQuantityInputValue}>
+        max={quantity}>
       <span>шт.</span>
     </div>
     {#if quantity < quantityWarningLevel}

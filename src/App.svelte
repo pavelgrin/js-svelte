@@ -9,36 +9,19 @@ import CartItem from './components/CartItem.svelte';
 /*
  * declare main variables
  */
+const usdRateRange = [20, 80]; // min, max
+
 let appError = null;
+
 // init random usd rate between 20 and 80
-let exchangeRate = Math.floor(Math.random() * (81 - 20) + 20);
+let exchangeRate = Math.floor(
+  Math.random() * (usdRateRange[0] + 1 - usdRateRange[1]) + usdRateRange[1],
+);
 
 const data = {
   goods: null,
   categories: null,
 };
-
-/**
- * validate and update exchangeRate value
- *
- * @param {Object} Event.detail - payload
- * @return Void
-*/
-function handleExchangeRateInputValue(e) {
-  let newRate = Number(e.target.value);
-
-  if (Number.isNaN(newRate) || newRate < 20) {
-    newRate = 20;
-  } else if (newRate > 80) {
-    newRate = 80;
-  } else {
-    newRate = e.target.value;
-  }
-
-  e.target.value = newRate;
-  exchangeRate = newRate;
-}
-
 
 /**
  * delay event processing until typing stops
@@ -91,11 +74,20 @@ async function getNames() {
  * @return Void
 */
 const recalcPrices = debounce((rate) => {
+  let newRate = Number(rate);
+
+  // validate usd rate
+  if (Number.isNaN(newRate) || newRate < usdRateRange[0]) {
+    [newRate] = usdRateRange;
+  } else if (newRate > usdRateRange[1]) {
+    [, newRate] = usdRateRange;
+  }
+
   Object.keys(data.goods).forEach((key) => {
     const usdPrice = Number(data.goods[key].usdPrice);
 
     const oldRubPrice = Number(data.goods[key].rubPrice);
-    const newRubPrice = Number((usdPrice * Number(rate)).toFixed(2));
+    const newRubPrice = Number((usdPrice * newRate).toFixed(2));
 
     const priceChange = (newRubPrice > oldRubPrice && 'increase')
                      || (newRubPrice < oldRubPrice && 'decrease')
@@ -173,13 +165,24 @@ function addProductToCart({ detail }) {
 
 /**
  * update picked quantity
+ * with validation
  *
  * @param {Object} Event.detail - payload
  * @return Void
 */
 function updatePickedQuantity({ detail }) {
   const { productId, pickedQuantity } = detail;
-  data.goods[productId].pickedQuantity = Number(pickedQuantity);
+  const { quantity } = data.goods[productId];
+
+  let newQuantity = Number(pickedQuantity);
+
+  if (Number.isNaN(newQuantity) || newQuantity < 1) {
+    newQuantity = 1;
+  } else if (newQuantity > quantity) {
+    newQuantity = quantity;
+  }
+
+  data.goods[productId].pickedQuantity = newQuantity;
 }
 
 /**
@@ -237,11 +240,10 @@ onMount(async () => {
       <label for="rate">Курс USD</label>
       <input
         id="rate"
-        value={exchangeRate}
+        bind:value={exchangeRate}
         type="number"
-        min="20"
-        max="80"
-        on:input={handleExchangeRateInputValue}>
+        min="{usdRateRange[0]}"
+        max="{usdRateRange[1]}">
     </div>
 
     {#if !data.categories}
@@ -275,6 +277,7 @@ onMount(async () => {
 
 <style type="text/scss">
 .app__error {
+  min-width: 700px;
   max-width: 1360px;
   margin: 0 auto;
   padding: 0.4em;
@@ -283,8 +286,10 @@ onMount(async () => {
 }
 
 .app__content {
+  min-width: 800px;
   max-width: 1360px;
   margin: 0 auto;
+  padding: 0.4em;
 }
 
 .app__content > div + div {
